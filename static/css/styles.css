@@ -1,0 +1,28 @@
+body {
+    font-family: 'Arial', sans-serif;
+    text-align: center;
+    background-color: #878770;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  form {
+    background-color: #ffffff;
+    display: inline-block;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+  
+  input {
+    margin: 5px;
+    padding: 8px;
+    width: 250px;
+  }
+  
+  button {
+    padding: 10px 15px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+  
