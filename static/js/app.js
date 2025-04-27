@@ -110,31 +110,35 @@ function uploadPicture(itemDiv, itemText, index) {
     input.style.display = 'none';
     document.body.appendChild(input);
 
-
     input.addEventListener('change', (e) => {
         const file = e.target.files[0];
         const reader = new FileReader();
         reader.onload = function(event) {
+            const polaroidDiv = document.createElement('div');
+            polaroidDiv.className = 'polaroid';
+
             const img = document.createElement('img');
             img.src = event.target.result;
-            img.className = 'polaroid';
-            polaroidString.appendChild(img);
 
+            const caption = document.createElement('div');
+            caption.className = 'caption';
+            caption.textContent = itemText;
 
-            // Replace zombie with butterfly
-            zombies[index].isButterfly = true;
-
+            polaroidDiv.appendChild(img);
+            polaroidDiv.appendChild(caption);
+            polaroidString.appendChild(polaroidDiv);
 
             completedItems++;
-            checkCompletion();
+            if (completedItems === bucketItems.length) {
+                alert('Congratulations! You completed your bucket list!');
+            }
         };
         reader.readAsDataURL(file);
     });
 
-
     input.click();
-    document.body.removeChild(input);
 }
+
 
 
 // Setup initial zombies
