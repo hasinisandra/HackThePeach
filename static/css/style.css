@@ -1,57 +1,39 @@
-/* Global Styles */
+/* Global styles */
 body {
-  font-family: 'Orbitron', sans-serif;
+  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-image: url('static/images/desert.jpg'); /* Replace with a dark blue-toned image if you want */
+  background-image: url('static/images/desert.jpg');
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
-  color: #d0e7ff;
+  color: white;
   text-align: center;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  backdrop-filter: brightness(0.6);
 }
 
 h1, h2 {
   margin: 20px 0;
 }
 
-/* Button Styles */
 button {
   padding: 10px 20px;
   background-color: #ff8c00;
   color: white;
   border: none;
-  border-radius: 10px;
   cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-  transition: background 0.3s, transform 0.2s;
-  box-shadow: 0 4px 10px rgba(0, 0, 50, 0.6);
+  font-size: 16px;
 }
 
 button:hover {
   background-color: #e07b00;
 }
 
-/* Input Styles */
 #inputs input {
-  margin: 8px;
-  padding: 12px;
+  margin: 5px;
+  padding: 10px;
   font-size: 16px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(30, 60, 120, 0.7);
-  color: #d0e7ff;
-  outline: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 50, 0.5);
 }
 
-/* Minigame Modal Styles */
+/* Minigame styles */
 #minigameModal {
   position: fixed;
   top: 20%;
@@ -62,11 +44,8 @@ button:hover {
   padding: 30px;
   border-radius: 20px;
   z-index: 9999;
-  box-shadow: 0 8px 25px rgba(0, 0, 50, 0.7);
-  max-width: 90%;
 }
 
-/* Minigame Area Styles */
 #minigameArea {
   position: relative;
   width: 300px;
@@ -75,10 +54,8 @@ button:hover {
   background: #333;
   border: 3px solid #fff;
   overflow: hidden;
-  box-shadow: 0 0 20px rgba(42, 82, 152, 0.6);
 }
 
-/* Target (Zombie) Styles */
 #zombieTarget {
   position: absolute;
   width: 80px;
@@ -86,18 +63,10 @@ button:hover {
   top: 60px;
   left: 0;
   cursor: pointer;
-  transition: transform 0.3s;
 }
 
-#zombieTarget:hover {
-  transform: scale(1.2);
-}
-
-/* Canvas Styles */
 #zombieCanvas {
   width: 100%;
   height: 250px;
-  border: 2px solid #2a5298;
-  background: #0a1a33;
-  border-radius: 10px;
+  border: 1px solid #fff;
 }
