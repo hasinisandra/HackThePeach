@@ -3,7 +3,7 @@
   font-family: 'Arial', sans-serif;
   margin: 0;
   padding: 0;
-  background-image: url('static/images/desert.jpg'); /* Replace with a dark blue-toned image if you want */
+  background-image: url('static/images/desert.png'); /* Replace with a dark blue-toned image if you want */
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
