@@ -10,6 +10,7 @@ const timerDisplay = document.getElementById('timer');
 const minigameModal = document.getElementById('minigameModal');
 const zombieTarget = document.getElementById('zombieTarget');
 
+
 let zombies = [];
 let completedItems = 0;
 let bucketItems = [];
@@ -17,21 +18,25 @@ let timeLeft;
 let timerInterval;
 let minigameCallback;
 
+
 // Start the game
 bucketForm.addEventListener('submit', (e) => {
     e.preventDefault();
     startGame();
 });
 
+
 // Start the game function
 function startGame() {
     landingPage.style.display = 'none';
     gamePage.style.display = 'block';
 
+
     // Get time limit
     const timeLimit = document.getElementById('timeLimit').value;
     timeLeft = parseInt(timeLimit) * 60; // convert minutes to seconds
     startTimer();
+
 
     // Setup bucket list
     const inputs = document.querySelectorAll('#inputs input');
@@ -42,10 +47,12 @@ function startGame() {
         const itemText = input.value;
         bucketItems.push({ text: itemText, completed: false });
 
+
         const itemDiv = document.createElement('div');
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.dataset.index = index;
+
 
         checkbox.addEventListener('change', () => {
             if (checkbox.checked) {
@@ -53,15 +60,18 @@ function startGame() {
             }
         });
 
+
         itemDiv.appendChild(checkbox);
         itemDiv.appendChild(document.createTextNode(itemText));
         bucketList.appendChild(itemDiv);
     });
 
+
     // Setup zombies
     setupZombies();
     animateCanvas();
 }
+
 
 // Timer function
 function startTimer() {
@@ -76,11 +86,13 @@ function startTimer() {
     }, 1000);
 }
 
+
 function updateTimerDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
     timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
+
 
 // Handle checklist item checked
 function handleCheck(itemDiv, itemText, index) {
@@ -89,6 +101,7 @@ function handleCheck(itemDiv, itemText, index) {
     });
 }
 
+
 // Upload picture after winning minigame
 function uploadPicture(itemDiv, itemText, index) {
     const input = document.createElement('input');
@@ -96,6 +109,7 @@ function uploadPicture(itemDiv, itemText, index) {
     input.accept = 'image/*';
     input.style.display = 'none';
     document.body.appendChild(input);
+
 
     input.addEventListener('change', (e) => {
         const file = e.target.files[0];
@@ -106,8 +120,10 @@ function uploadPicture(itemDiv, itemText, index) {
             img.className = 'polaroid';
             polaroidString.appendChild(img);
 
+
             // Replace zombie with butterfly
             zombies[index].isButterfly = true;
+
 
             completedItems++;
             checkCompletion();
@@ -115,9 +131,11 @@ function uploadPicture(itemDiv, itemText, index) {
         reader.readAsDataURL(file);
     });
 
+
     input.click();
     document.body.removeChild(input);
 }
+
 
 // Setup initial zombies
 function setupZombies() {
@@ -131,18 +149,22 @@ function setupZombies() {
     });
 }
 
+
 // Animate zombies and butterflies
 function animateCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = 250;
 
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
 
     zombies.forEach(z => {
         z.x += z.speed;
         if (z.x > canvas.width) {
             z.x = -50; // Loop around
         }
+
 
         if (z.isButterfly) {
             const img = new Image();
@@ -155,8 +177,10 @@ function animateCanvas() {
         }
     });
 
+
     requestAnimationFrame(animateCanvas);
 }
+
 
 // Check if all items are completed
 function checkCompletion() {
@@ -167,16 +191,20 @@ function checkCompletion() {
     }
 }
 
+
 // === MINIGAME FUNCTIONS ===
+
 
 // Open minigame popup
 function openMinigame(callback) {
     minigameModal.style.display = 'block';
     minigameCallback = callback;
 
+
     zombieTarget.style.left = '0px';
     moveZombie();
 }
+
 
 // Move the zombie inside minigame
 function moveZombie() {
@@ -185,6 +213,7 @@ function moveZombie() {
         position += 5;
         zombieTarget.style.left = position + 'px';
 
+
         if (position > 300) {
             clearInterval(interval);
             closeMinigame(false); // missed!
@@ -192,10 +221,12 @@ function moveZombie() {
     }, 100);
 }
 
+
 // Clicking the zombie to win
 zombieTarget.addEventListener('click', () => {
     closeMinigame(true);
 });
+
 
 // Close the minigame
 function closeMinigame(success) {
