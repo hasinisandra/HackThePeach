@@ -1,54 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Save the World: Bucket List</title>
-  <link rel="stylesheet" href="static/css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>End of the World Bucket List</title>
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
-
-<!-- Main Background Overlay -->
-<div class="overlay"></div>
-
-<!-- Landing Page -->
-<section id="landing" class="centered">
-  <h1>🌎 Save the World: Bucket List Challenge 🌵</h1>
-  <form id="bucketForm">
-    <div id="inputs">
-      <input type="text" placeholder="Bucket List Item 1" required>
-      <input type="text" placeholder="Bucket List Item 2" required>
-      <input type="text" placeholder="Bucket List Item 3" required>
+    <!-- Landing Page -->
+    <div id="landing">
+        <h1>End of the World Bucket List</h1>
+        <form id="bucketForm">
+            <div id="inputs">
+                <input type="text" placeholder="Bucket List Item 1" required>
+                <input type="text" placeholder="Bucket List Item 2" required>
+                <input type="text" placeholder="Bucket List Item 3" required>
+                <input type="text" placeholder="Bucket List Item 4" required>
+                <input type="text" placeholder="Bucket List Item 5" required>
+            </div>
+            <label for="timeLimit">Time (in minutes):</label>
+            <input type="number" id="timeLimit" min="1" required>
+            <button type="submit">Start Game</button>
+        </form>
     </div>
-    <button type="button" id="addItem" class="btn">+ Add Another Item</button><br><br>
 
-    <label for="timeLimit">Choose Time Limit:</label>
-    <select id="timeLimit" required>
-      <option value="10">10 Minutes</option>
-      <option value="30">30 Minutes</option>
-      <option value="60">1 Hour</option>
-    </select><br><br>
+    <!-- Game Page -->
+    <div id="game" style="display: none;">
+        <h2>Complete Your Bucket List Before the World Ends!</h2>
+        <div id="timer"></div>
+        <div id="bucketList"></div>
+        <div id="polaroidString"></div>
+        <canvas id="zombieCanvas"></canvas>
+    </div>
 
-    <button type="submit" id="startBtn" class="btn">Start Saving the World!</button>
-  </form>
-</section>
+    <!-- Minigame Popup -->
+    <div id="minigameModal" style="display: none;">
+        <h2>🧟‍♂️ Shoot the Zombie!</h2>
+        <div id="minigameArea">
+            <img id="zombieTarget" src="static/images/zombie.png" alt="Zombie" />
+        </div>
+        <p>Click the zombie before it escapes!</p>
+    </div>
 
-<!-- Game Section -->
-<section id="game" style="display: none;">
-  <div id="timer"></div>
-  <div id="bucketList"></div>
-  <div id="polaroidString"></div>
-  <canvas id="zombieCanvas"></canvas>
-  <!-- Minigame Modal -->
-<div id="minigameModal" style="display:none;">
-  <h2>🧟‍♂️ Shoot the Zombie!</h2>
-  <div id="minigameArea">
-    <img id="zombieTarget" src="static/images/zombie.png" alt="Zombie" />
-  </div>
-  <p>Click the zombie before it escapes!</p>
-</div>
-
-</section>
-
-<script src="static/js/app.js"></script>
+    <script src="static/js/app.js"></script>
 </body>
 </html>

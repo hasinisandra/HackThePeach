@@ -11,11 +11,10 @@ const minigameModal = document.getElementById('minigameModal');
 const zombieTarget = document.getElementById('zombieTarget');
 
 let zombies = [];
-let butterflies = [];
 let completedItems = 0;
 let bucketItems = [];
-let timerInterval;
 let timeLeft;
+let timerInterval;
 let minigameCallback;
 
 // Start the game
@@ -24,7 +23,7 @@ bucketForm.addEventListener('submit', (e) => {
     startGame();
 });
 
-// Start Game Function
+// Start the game function
 function startGame() {
     landingPage.style.display = 'none';
     gamePage.style.display = 'block';
@@ -148,4 +147,62 @@ function animateCanvas() {
         if (z.isButterfly) {
             const img = new Image();
             img.src = 'static/images/butterfly.png';
-            ctx.drawImage
+            ctx.drawImage(img, z.x, z.y, 50, 50);
+        } else {
+            const img = new Image();
+            img.src = 'static/images/zombie.png';
+            ctx.drawImage(img, z.x, z.y, 50, 50);
+        }
+    });
+
+    requestAnimationFrame(animateCanvas);
+}
+
+// Check if all items are completed
+function checkCompletion() {
+    if (completedItems === bucketItems.length) {
+        clearInterval(timerInterval);
+        alert('You saved the world!! 🌎🎉');
+        document.body.style.backgroundImage = 'url("static/images/greenery.jpg")';
+    }
+}
+
+// === MINIGAME FUNCTIONS ===
+
+// Open minigame popup
+function openMinigame(callback) {
+    minigameModal.style.display = 'block';
+    minigameCallback = callback;
+
+    zombieTarget.style.left = '0px';
+    moveZombie();
+}
+
+// Move the zombie inside minigame
+function moveZombie() {
+    let position = 0;
+    const interval = setInterval(() => {
+        position += 5;
+        zombieTarget.style.left = position + 'px';
+
+        if (position > 300) {
+            clearInterval(interval);
+            closeMinigame(false); // missed!
+        }
+    }, 100);
+}
+
+// Clicking the zombie to win
+zombieTarget.addEventListener('click', () => {
+    closeMinigame(true);
+});
+
+// Close the minigame
+function closeMinigame(success) {
+    minigameModal.style.display = 'none';
+    if (success && minigameCallback) {
+        minigameCallback();
+    } else {
+        alert('You missed! Try checking the item again!');
+    }
+}
