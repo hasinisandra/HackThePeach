@@ -1,65 +1,133 @@
+/* Background Settings */
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Arial', sans-serif;
-  text-align: center;
+  font-family: 'Poppins', sans-serif;
   background-image: url("../images/desert.jpg");
   background-size: cover;
+  background-attachment: fixed;
   background-position: center;
   background-repeat: no-repeat;
-  transition: background-image 3s ease; /* Slow transition */
+  height: 100vh;
+  overflow-x: hidden;
+  position: relative;
 }
 
-#landing {
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+}
+
+/* Layout Settings */
+.centered {
+  position: relative;
+  z-index: 2;
   margin-top: 50px;
+  color: #fff;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
 }
 
+/* Buttons */
+.btn {
+  background-color: #ffa500;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background-color: #ff7f00;
+}
+
+/* Form Inputs */
+input[type="text"], select {
+  padding: 10px;
+  margin: 8px;
+  border-radius: 10px;
+  border: none;
+  width: 80%;
+  max-width: 400px;
+}
+
+/* Game Section */
 #game {
+  position: relative;
   padding-top: 20px;
+  z-index: 2;
 }
 
 #timer {
-  font-size: 30px;
-  font-weight: bold;
-  margin: 10px;
+  font-size: 36px;
+  margin-top: 10px;
+  color: #fff;
 }
 
+/* Bucket List Items */
 #bucketList {
-  margin: 20px;
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 #bucketList div {
-  margin-bottom: 15px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 15px;
+  padding: 15px;
+  margin: 10px;
+  min-width: 220px;
+  text-align: left;
+  color: #333;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
 }
 
-#zombieCanvas {
-  width: 100%;
-  height: 250px;
-  background: transparent;
-  margin-top: 20px;
+#bucketList input[type="checkbox"] {
+  margin-right: 10px;
 }
 
+/* Polaroid Area */
 #polaroidString {
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  margin-top: 20px;
+  padding-bottom: 20px;
 }
 
 .polaroid {
-  width: 100px;
-  height: 120px;
-  background: white;
+  width: 120px;
+  height: 140px;
+  background: #fff;
+  border: 3px solid #ddd;
+  border-radius: 10px;
   margin: 10px;
-  padding: 5px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
 }
 
 .polaroid img {
-  width: 90px;
-  height: 90px;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
+}
+
+/* Canvas */
+#zombieCanvas {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 250px;
+  pointer-events: none; /* So clicks go through */
+  background: transparent;
 }

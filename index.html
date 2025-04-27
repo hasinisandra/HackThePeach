@@ -7,8 +7,11 @@
 </head>
 <body>
 
+<!-- Main Background Overlay -->
+<div class="overlay"></div>
+
 <!-- Landing Page -->
-<section id="landing">
+<section id="landing" class="centered">
   <h1>🌎 Save the World: Bucket List Challenge 🌵</h1>
   <form id="bucketForm">
     <div id="inputs">
@@ -16,7 +19,7 @@
       <input type="text" placeholder="Bucket List Item 2" required>
       <input type="text" placeholder="Bucket List Item 3" required>
     </div>
-    <button type="button" id="addItem">+ Add Another Item</button><br><br>
+    <button type="button" id="addItem" class="btn">+ Add Another Item</button><br><br>
 
     <label for="timeLimit">Choose Time Limit:</label>
     <select id="timeLimit" required>
@@ -25,7 +28,7 @@
       <option value="60">1 Hour</option>
     </select><br><br>
 
-    <button type="submit" id="startBtn">Start Saving the World!</button>
+    <button type="submit" id="startBtn" class="btn">Start Saving the World!</button>
   </form>
 </section>
 
@@ -33,8 +36,8 @@
 <section id="game" style="display: none;">
   <div id="timer"></div>
   <div id="bucketList"></div>
-  <canvas id="zombieCanvas"></canvas>
   <div id="polaroidString"></div>
+  <canvas id="zombieCanvas"></canvas>
 </section>
 
 <script src="static/js/app.js"></script>
