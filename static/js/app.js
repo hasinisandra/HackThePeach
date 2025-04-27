@@ -163,8 +163,6 @@ function checkCompletion() {
     if (completedItems === bucketItems.length) {
         clearInterval(timerInterval);
         alert('You saved the world!! 🌎🎉');
-        
-        // Change background to greenery once all tasks are completed
         document.body.style.backgroundImage = 'url("static/images/greenery.jpg")';
     }
 }
