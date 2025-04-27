@@ -11,19 +11,21 @@ body {
 
 h1, h2 {
   margin: 20px 0;
+  font-size: 16px;
+  color: darkblue;
 }
 
 button {
   padding: 10px 20px;
-  background-color: #ff8c00;
-  color: white;
+  background-color: lightblue;
+  color: darkblue;
   border: none;
   cursor: pointer;
   font-size: 16px;
 }
 
 button:hover {
-  background-color: #e07b00;
+  background-color: blue;
 }
 
 #inputs input {
@@ -38,8 +40,8 @@ button:hover {
   top: 20%;
   left: 50%;
   transform: translate(-50%, -20%);
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
+  background: rgba(41, 5, 71, 0.9);
+  color: lightcyan;
   padding: 30px;
   border-radius: 20px;
   z-index: 9999;
@@ -50,8 +52,8 @@ button:hover {
   width: 300px;
   height: 200px;
   margin: 20px auto;
-  background: #333;
-  border: 3px solid #fff;
+  background: black;
+  border: 3px solid lightsteelblue;
   overflow: hidden;
 }
 
