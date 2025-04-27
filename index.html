@@ -319,6 +319,48 @@
             overflow-y: scroll; /* Always show vertical scrollbar */
         }
 
+        /* Loading indicator for caption generation */
+        #captionLoading {
+            display: none;
+            margin: 10px 0;
+            color: #a3cfff;
+        }
+
+        /* Update polaroid style for captions */
+        .polaroid p {
+            color: #333;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 5px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+
+        /* API Key Form */
+        #apiKeyModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 20, 40, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            z-index: 10001; /* Higher than other modals */
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+        }
+
+        #apiKeyInput {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: none;
+            background: rgba(30, 60, 120, 0.7);
+            color: #d0e7ff;
+            font-size: 16px;
+        }
+
     </style>
 </head>
 <body>
@@ -370,6 +412,7 @@
     <div id="uploadModal">
         <h3>Capture Your Memory</h3>
         <div id="uploadMessage"></div>
+        <div id="captionLoading">Generating apocalyptic caption...</div>
         <img id="uploadPreview" src="" alt="Preview">
         <input type="file" id="photoInput" accept="image/*" style="display: none;">
         <button id="uploadBtn">Select Photo</button>
@@ -433,10 +476,10 @@
         }
 
         // Load images
+        // Load images
         function loadImages() {
             zombieImg.src = 'static/images/zombie.png';
-            butterflyImg.src = 'butterfly.png';
-            
+            butterflyImg.src = 'static/images/butterfly.png';
             // Add error handling for image loading
             zombieImg.onerror = () => {
                 console.error("Error loading zombie.png");
@@ -547,7 +590,8 @@
             bucketList.innerHTML = '';
             
             items.forEach((itemText, index) => {
-                bucketItems.push({ text: itemText, completed: false });
+                // Add caption: null to the bucket items
+                bucketItems.push({ text: itemText, completed: false, caption: null });
 
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'bucket-item';
@@ -743,6 +787,8 @@
             uploadMessage.textContent = `Upload a photo of you completing: "${bucketItems[itemIndex].text}"`;
             uploadPreview.style.display = 'none';
             confirmUpload.style.display = 'none';
+            // Add this line to the showPhotoUpload function
+            captionLoading.style.display = 'none';
             
             // Reset file input
             photoInput.value = '';
@@ -768,38 +814,74 @@
             
             // Handle photo confirmation
             confirmUpload.onclick = () => {
+                captionLoading.style.display = 'block';
+                confirmUpload.disabled = true;
                 handlePhotoUploaded(itemIndex, uploadPreview.src);
             };
         }
 
         // Handle photo uploaded
-        function handlePhotoUploaded(itemIndex, imageUrl) {
-            // Update bucket item as completed
-            bucketItems[itemIndex].completed = true;
-            const checkbox = document.querySelector(`#item-${itemIndex}`);
-            checkbox.checked = true;
-            checkbox.disabled = true;
+        // Handle photo uploaded
+        async function handlePhotoUploaded(itemIndex, imageUrl) {
+            // Show loading indicator for caption
+            captionLoading.style.display = 'block';
+            confirmUpload.disabled = true;
             
-            // Transform zombie to butterfly
-            zombies[itemIndex].isButterfly = true;
-            
-            // Add photo to collage
-            addPhotoToCollage(imageUrl, bucketItems[itemIndex].text);
-            
-            // Close upload modal
-            uploadModal.style.display = 'none';
-            
-            // Update completed items
-            completedItems++;
-            itemsCompleteDisplay.textContent = `Completed: ${completedItems}/5`;
-            
-            // Update color saturation based on completion percentage
-            updateSaturation();
-            
-            // Check if all items are completed
-            checkCompletion();
+            try {
+                // Generate caption with Hack Club API
+                const caption = await generateCaption(bucketItems[itemIndex].text);
+                bucketItems[itemIndex].caption = caption;
+                
+                // Update bucket item as completed
+                bucketItems[itemIndex].completed = true;
+                const checkbox = document.querySelector(`#item-${itemIndex}`);
+                checkbox.checked = true;
+                checkbox.disabled = true;
+                
+                // Transform zombie to butterfly
+                zombies[itemIndex].isButterfly = true;
+                
+                // Add photo to collage with AI-generated caption
+                addPhotoToCollage(imageUrl, caption);
+                
+                // Close upload modal
+                uploadModal.style.display = 'none';
+                
+                // Update completed items
+                completedItems++;
+                itemsCompleteDisplay.textContent = `Completed: ${completedItems}/5`;
+                
+                // Update color saturation based on completion percentage
+                updateSaturation();
+                
+                // Check if all items are completed
+                checkCompletion();
+            } catch (error) {
+                console.error("Error generating caption:", error);
+                
+                // Use a default caption if there's an error
+                const defaultCaption = `Last hurrah: ${bucketItems[itemIndex].text}`;
+                bucketItems[itemIndex].caption = defaultCaption;
+                
+                // Continue with the rest of the process
+                bucketItems[itemIndex].completed = true;
+                document.querySelector(`#item-${itemIndex}`).checked = true;
+                document.querySelector(`#item-${itemIndex}`).disabled = true;
+                zombies[itemIndex].isButterfly = true;
+                addPhotoToCollage(imageUrl, defaultCaption);
+                uploadModal.style.display = 'none';
+                completedItems++;
+                itemsCompleteDisplay.textContent = `Completed: ${completedItems}/5`;
+                updateSaturation();
+                checkCompletion();
+            } finally {
+                // Hide loading indicator
+                captionLoading.style.display = 'none';
+                confirmUpload.disabled = false;
+            }
         }
 
+        // Add photo to polaroid collage
         // Add photo to polaroid collage
         function addPhotoToCollage(imageUrl, caption) {
             const polaroid = document.createElement('div');
@@ -815,10 +897,6 @@
             
             const captionText = document.createElement('p');
             captionText.textContent = caption;
-            captionText.style.color = '#333';
-            captionText.style.fontSize = '12px';
-            captionText.style.textAlign = 'center';
-            captionText.style.marginTop = '5px';
             
             polaroid.appendChild(img);
             polaroid.appendChild(captionText);
@@ -878,11 +956,57 @@
             };
         }
 
+        // Generate AI caption function
+        // Generate AI caption function
+        async function generateCaption(taskDescription) {
+            try {
+                const response = await fetch('https://ai.hackclub.com/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            {
+                                role: "system",
+                                content: "You are a funny caption generator for an 'End of the World' bucket list web app. Create a witty, humorous, or cute caption (limit 60 characters) for an image of someone completing a bucket list item before the apocalypse. Use apocalyptic humor, end-of-world jokes, or cute references to doomsday. Keep captions short, funny and upbeat."
+                            },
+                            {
+                                role: "user",
+                                content: `Generate a short, funny caption for a photo of someone who just completed this bucket list item: "${taskDescription}". The caption should be funny or cute, with an end-of-the-world theme.`
+                            }
+                        ]
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.choices && data.choices[0] && data.choices[0].message) {
+                    let caption = data.choices[0].message.content.trim();
+                    // Remove quotes if present
+                    if ((caption.startsWith('"') && caption.endsWith('"')) || 
+                        (caption.startsWith("'") && caption.endsWith("'"))) {
+                        caption = caption.substring(1, caption.length - 1);
+                    }
+                    return caption;
+                } else {
+                    console.error('Unexpected API response format:', data);
+                    return `Last hurrah: ${taskDescription}`;
+                }
+            } catch (error) {
+                console.error('Error generating caption:', error);
+                return `Last hurrah: ${taskDescription}`;
+            }
+        }
+
+        // Initialize the page
         // Initialize the page
         window.onload = () => {
             initCanvas();
             loadImages();
+            landingPage.style.display = 'block'; // Make sure landing page is visible
         };
     </script>
 </body>
+
 </html>
