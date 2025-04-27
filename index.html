@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport">
     <title>End of the World Bucket List</title>
     <style>
         /* Global Styles */
@@ -30,7 +30,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: url('/api/placeholder/1600/900') no-repeat center center/cover;
+            background: url('landscape.png') no-repeat center center/cover;
             background-attachment: fixed;
             z-index: -1;
         }
@@ -195,8 +195,7 @@
             position: absolute;
             width: 60px;
             height: 60px;
-            background: url('/api/placeholder/60/60');
-            background-size: cover;
+            background: #5a3921;
             border-radius: 50%;
             top: 50%;
             left: 50%;
@@ -310,6 +309,11 @@
             margin-bottom: 30px;
             color: #a3cfff;
         }
+
+        body {
+            overflow-y: scroll; /* Always show vertical scrollbar */
+        }
+
     </style>
 </head>
 <body>
@@ -412,9 +416,10 @@
         let currentMoleHoles = [];
         let activeMole = null;
         let moleInterval = null;
-
-        // Add click event listener to the start button
-        startButton.addEventListener('click', startGame);
+        
+        // Add these variables for the images
+        let zombieImg = new Image();
+        let butterflyImg = new Image();
 
         // Initialize canvas size
         function initCanvas() {
@@ -422,8 +427,67 @@
             canvas.height = canvas.offsetHeight;
         }
 
+        // Load images
+        function loadImages() {
+            zombieImg.src = 'zombie.png';
+            butterflyImg.src = 'butterfly.png';
+            
+            // Add error handling for image loading
+            zombieImg.onerror = () => {
+                console.error("Error loading zombie.png");
+                // Set a fallback color to indicate missing images
+                zombieColor = "#FF0000";
+            };
+            
+            butterflyImg.onerror = () => {
+                console.error("Error loading butterfly.png");
+                // Set a fallback color
+                butterflyColor = "#00FF00";
+            };
+        }
+
+        // Add click event listener to the start button
+        startButton.addEventListener('click', startGame);
+
         // Resize handler
         window.addEventListener('resize', initCanvas);
+
+        // Fallback drawing functions in case images fail to load
+        function drawZombie(x, y) {
+            // Head
+            ctx.fillStyle = "#5D4037";
+            ctx.beginPath();
+            ctx.arc(x, y - 40, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.fillRect(x - 10, y - 30, 20, 30);
+            
+            // Arms
+            ctx.fillRect(x - 20, y - 25, 10, 5);
+            ctx.fillRect(x + 10, y - 25, 10, 5);
+            
+            // Legs
+            ctx.fillRect(x - 8, y, 5, 15);
+            ctx.fillRect(x + 3, y, 5, 15);
+        }
+
+        function drawButterfly(x, y) {
+            ctx.fillStyle = "#42A5F5";
+            
+            // Wings
+            ctx.beginPath();
+            ctx.ellipse(x - 10, y - 5, 15, 10, Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.beginPath();
+            ctx.ellipse(x + 10, y - 5, 15, 10, -Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.fillStyle = "#000";
+            ctx.fillRect(x - 1, y - 15, 2, 20);
+        }
 
         // Start the game function
         function startGame() {
@@ -546,40 +610,26 @@
             ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
 
             // Draw zombies or butterflies
-            zombies.forEach((entity, index) => {
+            zombies.forEach((entity) => {
                 if (entity.isButterfly) {
-                    // Draw butterfly (simplified for this example)
-                    ctx.fillStyle = '#ff9cee';
-                    ctx.beginPath();
-                    ctx.arc(entity.x, entity.y - 10, 15, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Draw wings
-                    ctx.fillStyle = '#ffc0ee';
-                    ctx.beginPath();
-                    ctx.ellipse(entity.x - 15, entity.y - 10, 15, 8, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.ellipse(entity.x + 15, entity.y - 10, 15, 8, 0, 0, Math.PI * 2);
-                    ctx.fill();
+                    // Draw butterfly using loaded image
+                    if (butterflyImg.complete && butterflyImg.naturalWidth !== 0) {
+                        ctx.drawImage(butterflyImg, entity.x - 20, entity.y - 30, 40, 40);
+                    } else {
+                        // Fallback if image isn't loaded
+                        drawButterfly(entity.x, entity.y);
+                    }
                     
                     // Animate butterfly flying upward
                     entity.y = Math.max(entity.y - 0.5, 50);
                 } else {
-                    // Draw zombie (simplified for this example)
-                    ctx.fillStyle = '#5d8c6e';
-                    ctx.fillRect(entity.x - 15, entity.y - 40, 30, 40);
-                    
-                    // Draw head
-                    ctx.fillStyle = '#8fc0a0';
-                    ctx.beginPath();
-                    ctx.arc(entity.x, entity.y - 50, 15, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    // Draw arms
-                    ctx.fillStyle = '#5d8c6e';
-                    ctx.fillRect(entity.x - 30, entity.y - 30, 15, 5);
-                    ctx.fillRect(entity.x + 15, entity.y - 30, 15, 5);
+                    // Draw zombie using loaded image
+                    if (zombieImg.complete && zombieImg.naturalWidth !== 0) {
+                        ctx.drawImage(zombieImg, entity.x - 15, entity.y - 60, 30, 60);
+                    } else {
+                        // Fallback if image isn't loaded
+                        drawZombie(entity.x, entity.y);
+                    }
                 }
             });
 
@@ -826,6 +876,7 @@
         // Initialize the page
         window.onload = () => {
             initCanvas();
+            loadImages();
         };
     </script>
 </body>
