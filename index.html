@@ -4,47 +4,829 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>End of the World Bucket List</title>
-    <link rel="stylesheet" href="static/css/style.css">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #d0e7ff;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            transition: filter 2s ease; /* Smooth transition for grayscale effect */
+            filter: grayscale(100%); /* Start with black and white */
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('/api/placeholder/1600/900') no-repeat center center/cover;
+            background-attachment: fixed;
+            z-index: -1;
+        }
+
+        /* Headings */
+        h1, h2 {
+            margin: 20px 0;
+            color: #a3cfff;
+            text-shadow: 2px 2px 6px rgba(0, 0, 50, 0.8);
+            letter-spacing: 2px;
+        }
+
+        /* Container Styling */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: rgba(10, 20, 40, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 50, 0.5);
+            z-index: 1;
+        }
+
+        /* Button Styles */
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #e0f2ff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: background 0.3s, transform 0.2s;
+            box-shadow: 0 4px 10px rgba(0, 0, 50, 0.6);
+            margin: 10px 0;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #2a5298, #1e3c72);
+            transform: scale(1.05);
+        }
+
+        /* Input Styles */
+        #inputs {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        #inputs input {
+            margin: 8px 0;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(30, 60, 120, 0.7);
+            color: #d0e7ff;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 50, 0.5);
+        }
+
+        #timeLimit {
+            width: 100px;
+            padding: 10px;
+            margin: 10px;
+            background: rgba(30, 60, 120, 0.7);
+            color: #d0e7ff;
+            border: none;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* Game Page Styling */
+        #game {
+            width: 90%;
+            max-width: 800px;
+        }
+
+        #timer {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 15px 0;
+            color: #ff6b6b;
+        }
+
+        #bucketList {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .bucket-item {
+            background: rgba(30, 60, 120, 0.6);
+            padding: 12px 20px;
+            border-radius: 10px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            text-align: left;
+            transition: background 0.3s;
+        }
+
+        .bucket-item:hover {
+            background: rgba(42, 82, 152, 0.7);
+        }
+
+        .bucket-item input {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        /* Minigame Modal */
+        #minigameModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 20, 40, 0.95);
+            color: #d0e7ff;
+            padding: 40px;
+            border-radius: 20px;
+            z-index: 9999;
+            box-shadow: 0 8px 25px rgba(0, 0, 50, 0.7);
+            max-width: 90%;
+            display: none;
+        }
+
+        /* Whack-a-mole Game Area */
+        #minigameArea {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            margin: 30px auto;
+            background: #112244;
+            border: 4px solid #2a5298;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(42, 82, 152, 0.6);
+        }
+
+        /* Mole Holes */
+        .mole-hole {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #0a1428;
+            box-shadow: inset 0 3px 10px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+        }
+
+        /* Mole */
+        .mole {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: url('/api/placeholder/60/60');
+            background-size: cover;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, 100%);
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+
+        .mole.visible {
+            transform: translate(-50%, -50%);
+        }
+
+        /* Zombie Canvas */
+        #zombieCanvas {
+            width: 100%;
+            height: 250px;
+            border: 2px solid #2a5298;
+            background: rgba(10, 26, 51, 0.5);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        /* Photo Upload Section */
+        #uploadModal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(10, 20, 40, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            z-index: 9998;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+            display: none;
+        }
+
+        #uploadMessage {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        #uploadPreview {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 15px 0;
+            border: 3px solid #2a5298;
+            border-radius: 10px;
+            display: none;
+        }
+
+        /* Polaroid Collage */
+        #polaroidCollage {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .polaroid {
+            background-color: white;
+            padding: 10px 10px 30px 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transform: rotate(var(--rotation));
+            width: 150px;
+            transition: transform 0.3s;
+        }
+
+        .polaroid img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+        }
+
+        .polaroid:hover {
+            transform: scale(1.1) rotate(var(--rotation));
+            z-index: 5;
+        }
+
+        /* Statistics Display */
+        #stats {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        #missedDisplay {
+            color: #ff6b6b;
+        }
+
+        /* Completion Screen */
+        #completionScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 20, 40, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        #completionMessage {
+            font-size: 32px;
+            margin-bottom: 30px;
+            color: #a3cfff;
+        }
+    </style>
 </head>
 <body>
     <!-- Landing Page -->
-    <div id="landing">
+    <div id="landing" class="container">
         <h1>End of the World Bucket List</h1>
-        <form id="bucketForm">
+        <p>Before the world ends, what 5 things would you like to accomplish?</p>
+        <div id="bucketForm">
             <div id="inputs">
-                <input type="text" placeholder="Bucket List Item 1" required>
-                <input type="text" placeholder="Bucket List Item 2" required>
-                <input type="text" placeholder="Bucket List Item 3" required>
-                <input type="text" placeholder="Bucket List Item 4" required>
-                <input type="text" placeholder="Bucket List Item 5" required>
+                <input type="text" id="item1" placeholder="Bucket List Item 1" required>
+                <input type="text" id="item2" placeholder="Bucket List Item 2" required>
+                <input type="text" id="item3" placeholder="Bucket List Item 3" required>
+                <input type="text" id="item4" placeholder="Bucket List Item 4" required>
+                <input type="text" id="item5" placeholder="Bucket List Item 5" required>
             </div>
-            <label for="timeLimit">Time (in minutes):</label>
-            <input type="number" id="timeLimit" min="1" required>
-            <button type="submit">Start Game</button>
-        </form>
+            <label for="timeLimit">Time until the end (in minutes):</label>
+            <input type="number" id="timeLimit" min="1" value="5" required>
+            <button type="button" id="startButton">Begin Your Final Journey</button>
+        </div>
     </div>
-
 
     <!-- Game Page -->
     <div id="game" style="display: none;">
         <h2>Complete Your Bucket List Before the World Ends!</h2>
         <div id="timer"></div>
         <div id="bucketList"></div>
-        <div id="polaroidString"></div>
-        <canvas id="zombieCanvas"></canvas>
-    </div>
-
-
-    <!-- Minigame Popup -->
-    <div id="minigameModal" style="display: none;">
-        <h2>🧟‍♂️ Shoot the Zombie!</h2>
-        <div id="minigameArea">
-            <img id="zombieTarget" src="static/images/zombie.png" alt="Zombie" />
+        
+        <div id="stats">
+            <div id="missedDisplay">Missed: 0</div>
+            <div id="itemsComplete">Completed: 0/5</div>
         </div>
-        <p>Click the zombie before it escapes!</p>
+        
+        <canvas id="zombieCanvas"></canvas>
+        
+        <div id="polaroidCollage"></div>
     </div>
 
+    <!-- Minigame Popup (Whack-a-mole) -->
+    <div id="minigameModal">
+        <h2>🧟‍♂️ Whack-a-Zombie!</h2>
+        <div id="minigameArea">
+            <!-- Mole holes will be generated by JS -->
+        </div>
+        <p>Whack 5 zombies to complete your task!</p>
+        <div id="moleScore">Score: 0/5</div>
+    </div>
 
-    <script src="static/js/app.js"></script>
+    <!-- Photo Upload Modal -->
+    <div id="uploadModal">
+        <h3>Capture Your Memory</h3>
+        <div id="uploadMessage"></div>
+        <img id="uploadPreview" src="" alt="Preview">
+        <input type="file" id="photoInput" accept="image/*" style="display: none;">
+        <button id="uploadBtn">Select Photo</button>
+        <button id="confirmUpload" style="display: none;">Confirm Upload</button>
+    </div>
+
+    <!-- Completion Screen -->
+    <div id="completionScreen">
+        <h2 id="completionMessage">You've Saved the World!</h2>
+        <div id="finalCollage"></div>
+        <button id="playAgainBtn">Play Again</button>
+    </div>
+
+    <script>
+        // Select elements
+        const landingPage = document.getElementById('landing');
+        const gamePage = document.getElementById('game');
+        const startButton = document.getElementById('startButton');
+        const bucketList = document.getElementById('bucketList');
+        const polaroidCollage = document.getElementById('polaroidCollage');
+        const canvas = document.getElementById('zombieCanvas');
+        const ctx = canvas.getContext('2d');
+        const timerDisplay = document.getElementById('timer');
+        const minigameModal = document.getElementById('minigameModal');
+        const minigameArea = document.getElementById('minigameArea');
+        const missedDisplay = document.getElementById('missedDisplay');
+        const uploadModal = document.getElementById('uploadModal');
+        const uploadMessage = document.getElementById('uploadMessage');
+        const uploadPreview = document.getElementById('uploadPreview');
+        const photoInput = document.getElementById('photoInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const confirmUpload = document.getElementById('confirmUpload');
+        const completionScreen = document.getElementById('completionScreen');
+        const finalCollage = document.getElementById('finalCollage');
+        const playAgainBtn = document.getElementById('playAgainBtn');
+        const itemsCompleteDisplay = document.getElementById('itemsComplete');
+        const moleScoreDisplay = document.getElementById('moleScore');
+
+        // Game state variables
+        let zombies = [];
+        let completedItems = 0;
+        let bucketItems = [];
+        let timeLeft;
+        let timerInterval;
+        let uploadedImages = [];
+        let currentItemIndex = -1;
+        let missed = 0;
+        let moleScore = 0;
+        let currentMoleHoles = [];
+        let activeMole = null;
+        let moleInterval = null;
+
+        // Add click event listener to the start button
+        startButton.addEventListener('click', startGame);
+
+        // Initialize canvas size
+        function initCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+
+        // Resize handler
+        window.addEventListener('resize', initCanvas);
+
+        // Start the game function
+        function startGame() {
+            // Get items from input fields
+            const items = [
+                document.getElementById('item1').value,
+                document.getElementById('item2').value,
+                document.getElementById('item3').value,
+                document.getElementById('item4').value,
+                document.getElementById('item5').value
+            ];
+            
+            // Check if all fields have values
+            if(items.some(item => !item.trim())) {
+                alert("Please fill out all 5 bucket list items!");
+                return;
+            }
+            
+            // Get time limit
+            const timeLimit = document.getElementById('timeLimit').value;
+            if(!timeLimit || parseInt(timeLimit) < 1) {
+                alert("Please enter a valid time limit (at least 1 minute)");
+                return;
+            }
+            
+            // Hide landing page, show game page
+            landingPage.style.display = 'none';
+            gamePage.style.display = 'block';
+            initCanvas();
+
+            // Set time
+            timeLeft = parseInt(timeLimit) * 60; // convert minutes to seconds
+            startTimer();
+
+            // Reset game state
+            completedItems = 0;
+            uploadedImages = [];
+            missed = 0;
+            itemsCompleteDisplay.textContent = `Completed: ${completedItems}/5`;
+
+            // Setup bucket list with the input values
+            setupBucketList(items);
+            
+            // Setup zombies
+            setupZombies();
+            animateCanvas();
+        }
+
+        // Setup bucket list items
+        function setupBucketList(items) {
+            bucketItems = [];
+            bucketList.innerHTML = '';
+            
+            items.forEach((itemText, index) => {
+                bucketItems.push({ text: itemText, completed: false });
+
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'bucket-item';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.dataset.index = index;
+                checkbox.id = `item-${index}`;
+
+                checkbox.addEventListener('change', () => {
+                    if (checkbox.checked && !bucketItems[index].completed) {
+                        currentItemIndex = index;
+                        openMinigame(index);
+                    }
+                });
+
+                const label = document.createElement('label');
+                label.htmlFor = `item-${index}`;
+                label.textContent = itemText;
+
+                itemDiv.appendChild(checkbox);
+                itemDiv.appendChild(label);
+                bucketList.appendChild(itemDiv);
+            });
+        }
+
+        // Timer function
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    alert('Time is up! The world ended...');
+                    window.location.reload();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `Time Left: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Setup initial zombies
+        function setupZombies() {
+            zombies = [];
+            for (let i = 0; i < bucketItems.length; i++) {
+                zombies.push({
+                    x: 50 + (i * (canvas.width / 5)),
+                    y: canvas.height - 70,
+                    isButterfly: false,
+                    index: i
+                });
+            }
+        }
+
+        // Animate zombies and butterflies
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw ground
+            ctx.fillStyle = '#2a1b0a';
+            ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+
+            // Draw zombies or butterflies
+            zombies.forEach((entity, index) => {
+                if (entity.isButterfly) {
+                    // Draw butterfly (simplified for this example)
+                    ctx.fillStyle = '#ff9cee';
+                    ctx.beginPath();
+                    ctx.arc(entity.x, entity.y - 10, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw wings
+                    ctx.fillStyle = '#ffc0ee';
+                    ctx.beginPath();
+                    ctx.ellipse(entity.x - 15, entity.y - 10, 15, 8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.ellipse(entity.x + 15, entity.y - 10, 15, 8, 0, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Animate butterfly flying upward
+                    entity.y = Math.max(entity.y - 0.5, 50);
+                } else {
+                    // Draw zombie (simplified for this example)
+                    ctx.fillStyle = '#5d8c6e';
+                    ctx.fillRect(entity.x - 15, entity.y - 40, 30, 40);
+                    
+                    // Draw head
+                    ctx.fillStyle = '#8fc0a0';
+                    ctx.beginPath();
+                    ctx.arc(entity.x, entity.y - 50, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Draw arms
+                    ctx.fillStyle = '#5d8c6e';
+                    ctx.fillRect(entity.x - 30, entity.y - 30, 15, 5);
+                    ctx.fillRect(entity.x + 15, entity.y - 30, 15, 5);
+                }
+            });
+
+            // Continue animation
+            requestAnimationFrame(animateCanvas);
+        }
+
+        // Open minigame popup (Whack-a-mole)
+        function openMinigame(itemIndex) {
+            minigameModal.style.display = 'block';
+            minigameArea.innerHTML = '';
+            moleScore = 0;
+            updateMoleScore();
+            
+            // Create 9 mole holes (3x3 grid)
+            createMoleHoles();
+            
+            // Start the mole game
+            startMoleGame();
+        }
+
+        // Create mole holes
+        function createMoleHoles() {
+            currentMoleHoles = [];
+            
+            // Create 3x3 grid of holes
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    const hole = document.createElement('div');
+                    hole.className = 'mole-hole';
+                    hole.style.left = (col * 100 + 25) + 'px';
+                    hole.style.top = (row * 60 + 20) + 'px';
+                    
+                    const mole = document.createElement('div');
+                    mole.className = 'mole';
+                    mole.addEventListener('click', () => {
+                        if (mole.classList.contains('visible')) {
+                            moleHit(mole);
+                        }
+                    });
+                    
+                    hole.appendChild(mole);
+                    minigameArea.appendChild(hole);
+                    currentMoleHoles.push(mole);
+                }
+            }
+        }
+
+        // Start the whack-a-mole game
+        function startMoleGame() {
+            if (moleInterval) clearInterval(moleInterval);
+            
+            moleInterval = setInterval(() => {
+                // Hide any visible mole
+                if (activeMole) {
+                    activeMole.classList.remove('visible');
+                    activeMole = null;
+                }
+                
+                // Show a random mole
+                const randomIndex = Math.floor(Math.random() * currentMoleHoles.length);
+                activeMole = currentMoleHoles[randomIndex];
+                activeMole.classList.add('visible');
+                
+                // Hide mole after a short time if not clicked
+                setTimeout(() => {
+                    if (activeMole && activeMole.classList.contains('visible')) {
+                        activeMole.classList.remove('visible');
+                        activeMole = null;
+                    }
+                }, 1000);
+                
+            }, 1200);
+        }
+
+        // Handle mole hit
+        function moleHit(mole) {
+            mole.classList.remove('visible');
+            moleScore++;
+            updateMoleScore();
+            
+            // Check if game is completed
+            if (moleScore >= 5) {
+                endMoleGame(true);
+            }
+        }
+
+        // Update mole score display
+        function updateMoleScore() {
+            moleScoreDisplay.textContent = `Score: ${moleScore}/5`;
+        }
+
+        // End the whack-a-mole game
+        function endMoleGame(success) {
+            clearInterval(moleInterval);
+            minigameModal.style.display = 'none';
+            
+            if (success) {
+                showPhotoUpload(currentItemIndex);
+            }
+        }
+
+        // Show photo upload dialog
+        function showPhotoUpload(itemIndex) {
+            uploadModal.style.display = 'block';
+            uploadMessage.textContent = `Upload a photo of you completing: "${bucketItems[itemIndex].text}"`;
+            uploadPreview.style.display = 'none';
+            confirmUpload.style.display = 'none';
+            
+            // Reset file input
+            photoInput.value = '';
+            
+            // Handle photo selection button
+            uploadBtn.onclick = () => {
+                photoInput.click();
+            };
+            
+            // Handle file selection
+            photoInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        uploadPreview.src = event.target.result;
+                        uploadPreview.style.display = 'block';
+                        confirmUpload.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+            
+            // Handle photo confirmation
+            confirmUpload.onclick = () => {
+                handlePhotoUploaded(itemIndex, uploadPreview.src);
+            };
+        }
+
+        // Handle photo uploaded
+        function handlePhotoUploaded(itemIndex, imageUrl) {
+            // Update bucket item as completed
+            bucketItems[itemIndex].completed = true;
+            const checkbox = document.querySelector(`#item-${itemIndex}`);
+            checkbox.checked = true;
+            checkbox.disabled = true;
+            
+            // Transform zombie to butterfly
+            zombies[itemIndex].isButterfly = true;
+            
+            // Add photo to collage
+            addPhotoToCollage(imageUrl, bucketItems[itemIndex].text);
+            
+            // Close upload modal
+            uploadModal.style.display = 'none';
+            
+            // Update completed items
+            completedItems++;
+            itemsCompleteDisplay.textContent = `Completed: ${completedItems}/5`;
+            
+            // Update color saturation based on completion percentage
+            updateSaturation();
+            
+            // Check if all items are completed
+            checkCompletion();
+        }
+
+        // Add photo to polaroid collage
+        function addPhotoToCollage(imageUrl, caption) {
+            const polaroid = document.createElement('div');
+            polaroid.className = 'polaroid';
+            
+            // Random rotation for polaroid effect
+            const rotation = Math.random() * 30 - 15; // -15 to +15 degrees
+            polaroid.style.setProperty('--rotation', `${rotation}deg`);
+            
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = caption;
+            
+            const captionText = document.createElement('p');
+            captionText.textContent = caption;
+            captionText.style.color = '#333';
+            captionText.style.fontSize = '12px';
+            captionText.style.textAlign = 'center';
+            captionText.style.marginTop = '5px';
+            
+            polaroid.appendChild(img);
+            polaroid.appendChild(captionText);
+            polaroidCollage.appendChild(polaroid);
+            
+            // Store for final display
+            uploadedImages.push({imageUrl, caption});
+        }
+
+        // Update background saturation based on completion
+        function updateSaturation() {
+            const percentageCompleted = completedItems / bucketItems.length;
+            const grayscaleValue = 100 - (percentageCompleted * 100);
+            document.body.style.filter = `grayscale(${grayscaleValue}%)`;
+        }
+
+        // Check if all items are completed
+        function checkCompletion() {
+            if (completedItems === bucketItems.length) {
+                setTimeout(() => {
+                    clearInterval(timerInterval);
+                    showCompletionScreen();
+                }, 1000);
+            }
+        }
+
+        // Show completion screen
+        function showCompletionScreen() {
+            completionScreen.style.display = 'flex';
+            finalCollage.innerHTML = '';
+            
+            // Create final collage display
+            uploadedImages.forEach(({imageUrl, caption}) => {
+                const polaroid = document.createElement('div');
+                polaroid.className = 'polaroid';
+                
+                // Random position and rotation
+                const rotation = Math.random() * 40 - 20;
+                polaroid.style.setProperty('--rotation', `${rotation}deg`);
+                
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.alt = caption;
+                
+                const captionText = document.createElement('p');
+                captionText.textContent = caption;
+                captionText.style.color = '#333';
+                
+                polaroid.appendChild(img);
+                polaroid.appendChild(captionText);
+                finalCollage.appendChild(polaroid);
+            });
+            
+            // Play again button
+            playAgainBtn.onclick = () => {
+                window.location.reload();
+            };
+        }
+
+        // Initialize the page
+        window.onload = () => {
+            initCanvas();
+        };
+    </script>
 </body>
 </html>
