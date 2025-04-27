@@ -2,30 +2,41 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bucket List Setup</title>
-  <link rel="stylesheet" href="static/css/styles.css">
+  <title>Save the World: Bucket List</title>
+  <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
-  <h1>🌎 Before the World Ends: Bucket List 🌵</h1>
 
-  <form id="setup-form">
-    <label for="timer">How much time do you have? (in minutes)</label><br>
-    <input type="number" id="timer" name="timer" min="1" required><br><br>
+<!-- Landing Page -->
+<section id="landing">
+  <h1>🌎 Save the World: Bucket List Challenge 🌵</h1>
+  <form id="bucketForm">
+    <div id="inputs">
+      <input type="text" placeholder="Bucket List Item 1" required>
+      <input type="text" placeholder="Bucket List Item 2" required>
+      <input type="text" placeholder="Bucket List Item 3" required>
+    </div>
+    <button type="button" id="addItem">Add Item</button><br><br>
 
-    <label>Enter 5-10 Bucket List Items:</label><br>
-    <div id="bucket-list-items">
-      <input type="text" name="item" required><br>
-      <input type="text" name="item" required><br>
-      <input type="text" name="item" required><br>
-      <input type="text" name="item" required><br>
-      <input type="text" name="item" required><br>
-    </div><br>
+    <label for="timeLimit">Choose Time Limit:</label>
+    <select id="timeLimit" required>
+      <option value="10">10 Minutes</option>
+      <option value="30">30 Minutes</option>
+      <option value="60">1 Hour</option>
+    </select><br><br>
 
-    <button type="button" id="add-item">➕ Add Item</button><br><br>
-
-    <button type="submit" id="start-adventure">Start Adventure 🚀</button>
+    <button type="submit" id="startBtn">Start Saving the World!</button>
   </form>
+</section>
 
-  <script src="static/js/index.js"></script>
+<!-- Game Section -->
+<section id="game" style="display: none;">
+  <div id="timer"></div>
+  <div id="bucketList"></div>
+  <canvas id="zombieCanvas"></canvas>
+  <div id="polaroidString"></div>
+</section>
+
+<script src="static/js/app.js"></script>
 </body>
 </html>
