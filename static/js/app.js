@@ -7,7 +7,8 @@ const ctx = canvas.getContext('2d');
 const polaroidString = document.getElementById('polaroidString');
 let zombies = [];
 let timerInterval;
-let remainingItems;
+let completedItems = 0;
+let totalItems = 0;
 
 document.getElementById('addItem').addEventListener('click', () => {
   const input = document.createElement('input');
@@ -20,17 +21,16 @@ document.getElementById('addItem').addEventListener('click', () => {
 form.addEventListener('submit', function(event) {
   event.preventDefault();
   
-  // Hide landing, show game
   landing.style.display = 'none';
   game.style.display = 'block';
 
-  // Collect items
+  // Collect bucket list items
   const items = [];
   document.querySelectorAll('#inputs input').forEach(input => {
     if (input.value.trim() !== '') items.push(input.value.trim());
   });
 
-  remainingItems = items.length;
+  totalItems = items.length;
 
   // Setup bucket list
   items.forEach((item, index) => {
@@ -42,11 +42,16 @@ form.addEventListener('submit', function(event) {
     `;
     bucketListDiv.appendChild(listItem);
 
-    listItem.querySelector('input[type="checkbox"]').addEventListener('change', function() {
-      listItem.querySelector('.upload').click();
+    const checkbox = listItem.querySelector('input[type="checkbox"]');
+    const upload = listItem.querySelector('.upload');
+
+    checkbox.addEventListener('change', function() {
+      if (this.checked) {
+        upload.click();
+      }
     });
 
-    listItem.querySelector('.upload').addEventListener('change', function(event) {
+    upload.addEventListener('change', function(event) {
       const file = event.target.files[0];
       if (file) {
         handleUpload(index, file);
@@ -56,11 +61,13 @@ form.addEventListener('submit', function(event) {
 
   // Setup zombies
   canvas.width = window.innerWidth;
-  canvas.height = 200;
+  canvas.height = 250;
   zombies = Array.from({length: items.length}).map(() => ({
     x: Math.random() * canvas.width,
-    y: Math.random() * 150,
-    img: new Image()
+    y: Math.random() * canvas.height,
+    speedX: Math.random() * 0.5 + 0.2,
+    img: new Image(),
+    alive: true
   }));
 
   zombies.forEach(z => z.img.src = 'static/images/zombie.png');
@@ -101,27 +108,43 @@ function handleUpload(index, file) {
 
     // Replace zombie with butterfly
     zombies[index].img.src = 'static/images/butterfly.png';
+    zombies[index].alive = false;
 
-    // Background changes gradually
-    document.body.style.backgroundImage = "url('static/images/greenery.jpg')";
-
-    remainingItems--;
-    if (remainingItems === 0) {
-      clearInterval(timerInterval);
-      setTimeout(() => {
-        alert('You saved the world! 🌎🎉');
-      }, 500);
-    }
+    completedItems++;
+    updateBackground();
+    checkVictory();
   };
   reader.readAsDataURL(file);
+}
+
+function updateBackground() {
+  const progress = completedItems / totalItems;
+  if (progress > 0.3 && progress <= 0.6) {
+    document.body.style.backgroundImage = "linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('static/images/greenery.jpg')";
+  } else if (progress > 0.6) {
+    document.body.style.backgroundImage = "url('static/images/greenery.jpg')";
+  }
+}
+
+function checkVictory() {
+  if (completedItems === totalItems) {
+    clearInterval(timerInterval);
+    setTimeout(() => {
+      alert('🎉 You saved the world! Great job!');
+    }, 500);
+  }
 }
 
 function drawZombies() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   zombies.forEach(zombie => {
     ctx.drawImage(zombie.img, zombie.x, zombie.y, 50, 50);
-    zombie.x += Math.random() * 2 - 1;
-    zombie.y += Math.random() * 2 - 1;
+    zombie.x += zombie.speedX;
+
+    if (zombie.x > canvas.width) {
+      zombie.x = -50; // Loop back around
+      zombie.y = Math.random() * (canvas.height - 50);
+    }
   });
   requestAnimationFrame(drawZombies);
 }
